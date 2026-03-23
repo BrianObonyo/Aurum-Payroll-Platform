@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aurum — Premium Payroll Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+/* ═══ THEME VARIABLES ═══ */
+:root[data-theme="dark"]{
+  --bg:#07091A;
+  --surface:#0D1126;
+  --surface2:#121830;
+  --surface3:#182040;
+  --border:#1C2645;
+  --border2:#253060;
+  --text:#E8EDF8;
+  --text2:#B8C2DC;
+  --muted:#5A6A9A;
+  --muted2:#7A8AB8;
+}
+:root[data-theme="light"]{
+  --bg:#F8F9FB;
+  --surface:#FFFFFF;
+  --surface2:#F3F4F6;
+  --surface3:#E9ECEF;
+  --border:#E0E3E8;
+  --border2:#D1D5DB;
+  --text:#1A1C26;
+  --text2:#3A3D4A;
+  --muted:#6B7280;
+  --muted2:#4B5563;
+}
+:root{
+  --gold:#C9962A;
+  --gold-light:#E8B84B;
+  --gold-pale:#F0C96A;
+  --gold-glow:rgba(201,150,42,0.12);
+  --gold-glow2:rgba(201,150,42,0.06);
+  --gold-line:rgba(201,150,42,0.25);
+  --danger:#E05555;
+  --success:#3DB885;
+  --info:#4A8FD4;
+  --warn:#D4913A;
+  --radius:8px;
+  --radius-lg:12px;
+  --sidebar:252px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow:hidden;}
+
+/* ─── NOISE TEXTURE (dark mode only) ─── */
+:root[data-theme="dark"] body::before{
+  content:'';pointer-events:none;
+  position:fixed;inset:0;z-index:0;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:128px;
+}
+
+/* ═══ MOBILE RESPONSIVE ═══ */
+@media(max-width:768px){
+  :root{--sidebar:0px;}
+  html,body{font-size:13px;}
+  .sidebar{
+    position:fixed;left:-100%;width:260px;height:100vh;z-index:1000;
+    transition:left .3s ease;
+  }
+  .sidebar.mobile-open{left:0;box-shadow:0 0 20px rgba(0,0,0,.5);}
+  .mobile-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;
+  }
+  .mobile-overlay.active{display:block;}
+  .mobile-menu-btn{
+    display:flex!important;width:36px;height:36px;border-radius:7px;
+    background:var(--surface2);border:1px solid var(--border2);
+    align-items:center;justify-content:center;cursor:pointer;color:var(--text);
+  }
+  .topbar{padding:0 16px;}
+  .content{padding:16px;}
+  .stat-row{grid-template-columns:1fr 1fr;gap:10px;}
+  .login-wrap{
+    grid-template-columns:1fr;width:90%;max-width:400px;height:auto;
+  }
+  .login-left{display:none;}
+  .login-right{padding:32px 24px;}
+  .chart-grid{grid-template-columns:1fr!important;}
+  table{font-size:11px;}
+  .pg-title{font-size:24px;}
+}
+.mobile-menu-btn{display:none;}
+
+/* ─── THEME TOGGLE ─── */
+.theme-toggle{
+  display:flex;align-items:center;gap:6px;padding:6px 10px;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:20px;
+  cursor:pointer;transition:all .2s;font-size:12px;
+}
+.theme-toggle:hover{background:var(--surface3);}
+.theme-toggle i{font-size:11px;color:var(--gold);}
+.theme-label{color:var(--muted2);font-size:11px;font-weight:500;}
+
+/* ─── LOGIN ─── */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  height:100vh;position:relative;z-index:1;
+}
+#login-screen::after{
+  content:'';position:absolute;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle, rgba(201,150,42,0.07) 0%, transparent 70%);
+  pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.login-wrap{
+  display:grid;grid-template-columns:1fr 1fr;
+  width:820px;height:520px;
+  border:1px solid var(--border2);border-radius:20px;
+  overflow:hidden;position:relative;z-index:1;
+}
+.login-left{
+  background:var(--surface2);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  justify-content:flex-end;padding:40px;
+  position:relative;overflow:hidden;
+}
+.login-left::before{
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,150,42,0.12) 0%,transparent 70%);
+}
+.login-left-logo{
+  display:flex;align-items:center;gap:10px;
+  position:absolute;top:36px;left:40px;
+}
+.logo-mark{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-pale) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-weight:600;font-size:16px;
+  color:#07091A;
+}
+.logo-wordmark{
+  font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;
+  color:var(--text);letter-spacing:.5px;
+}
+.login-tagline{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:32px;line-height:1.25;color:var(--text);margin-bottom:12px;
+}
+.login-tagline span{color:var(--gold-light);}
+.login-sub{font-size:12px;color:var(--muted2);line-height:1.6;}
+.login-right{
+  background:var(--surface);padding:48px 40px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.login-right h2{
+  font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;
+  color:var(--text);margin-bottom:4px;
+}
+.login-right p{font-size:12px;color:var(--muted);margin-bottom:32px;}
+.field{margin-bottom:16px;}
+.field label{
+  display:block;font-size:10px;font-weight:600;
+  color:var(--muted2);text-transform:uppercase;letter-spacing:.9px;margin-bottom:7px;
+}
+.field input{
+  width:100%;height:42px;padding:0 14px;
+  background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:13.5px;outline:none;
+  transition:border .2s,box-shadow .2s;
+}
+.field input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px var(--gold-glow);
+}
+.btn-gold{
+  width:100%;height:44px;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-pale) 100%);
+  color:#07091A;border:none;border-radius:var(--radius);
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;letter-spacing:.3px;margin-top:6px;
+  transition:opacity .2s,transform .1s;
+}
+.btn-gold:hover{opacity:.9;}
+.btn-gold:active{transform:scale(.98);}
+.btn-gold:disabled{opacity:.5;cursor:not-allowed;}
+.login-footer-note{
+  margin-top:24px;font-size:11px;color:var(--muted);
+  border-top:1px solid var(--border);padding-top:18px;
+  text-align:center;
+}
+.error-msg{
+  background:rgba(224,85,85,.1);border:1px solid var(--danger);
+  border-radius:var(--radius);padding:10px 12px;margin-bottom:16px;
+  font-size:12px;color:var(--danger);display:none;
+}
+.error-msg.show{display:block;}
+
+/* ─── APP ─── */
+#app-screen{display:none;height:100vh;flex-direction:row;position:relative;z-index:1;}
+#app-screen.active{display:flex;}
+
+/* ─── SIDEBAR ─── */
+.sidebar{
+  width:var(--sidebar);min-width:var(--sidebar);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:relative;
+}
+.sidebar::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,var(--gold-line) 40%,var(--gold-line) 60%,transparent);
+}
+.sidebar-top{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo{display:flex;align-items:center;gap:10px;}
+.sidebar-logo .logo-wordmark{font-size:20px;}
+.nav-group{padding:20px 12px 0;}
+.nav-label{
+  font-size:9px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.2px;
+  padding:0 10px;margin-bottom:6px;
+}
+.nav-btn{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:9px 12px;border-radius:var(--radius);
+  background:transparent;border:none;color:var(--muted2);
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:400;
+  cursor:pointer;text-align:left;transition:all .15s;margin-bottom:1px;
+}
+.nav-btn i{width:15px;font-size:12px;text-align:center;flex-shrink:0;}
+.nav-btn:hover{background:var(--surface2);color:var(--text2);}
+.nav-btn.active{
+  background:var(--gold-glow);color:var(--gold-light);
+  font-weight:500;
+  box-shadow:inset 2px 0 0 var(--gold);
+}
+.nav-btn.active i{color:var(--gold);}
+.sidebar-bottom{
+  margin-top:auto;padding:16px 12px;
+  border-top:1px solid var(--border);
+}
+.user-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:var(--radius);cursor:pointer;
+  transition:background .15s;
+}
+.user-row:hover{background:var(--surface2);}
+.avatar{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  background:var(--gold-glow);
+  border:1px solid var(--gold-line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:600;color:var(--gold);
+}
+.u-name{font-size:12.5px;font-weight:500;color:var(--text);}
+.u-role{font-size:10px;color:var(--muted);}
+
+/* ─── TOPBAR ─── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{
+  height:54px;min-height:54px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 28px;gap:16px;
+}
+.topbar-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:500;font-style:italic;
+  color:var(--text);flex:1;
+}
+.topbar-meta{font-size:11px;color:var(--muted);margin-left:auto;}
+.icon-btn{
+  width:32px;height:32px;border-radius:7px;
+  background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--muted2);font-size:12px;
+  transition:all .15s;position:relative;
+}
+.icon-btn:hover{background:var(--surface3);color:var(--text);}
+.notif-dot{
+  position:absolute;top:6px;right:6px;width:5px;height:5px;
+  border-radius:50%;background:var(--gold);
+}
+.content{flex:1;overflow-y:auto;padding:28px;background:var(--bg);}
+
+/* ─── FOOTER ─── */
+.app-footer{
+  padding:12px 28px;
+  background:var(--surface);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:var(--muted);
+}
+.footer-credits{display:flex;align-items:center;gap:20px;}
+.footer-link{color:var(--gold);text-decoration:none;transition:color .2s;}
+.footer-link:hover{color:var(--gold-light);}
+
+/* ─── PAGES ─── */
+.page{display:none;animation:rise .3s ease;}
+.page.active{display:block;}
+@keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+.pg-head{margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.pg-title{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:30px;font-weight:500;color:var(--text);
+  line-height:1;
+}
+.pg-title span{color:var(--gold-light);}
+.pg-sub{font-size:12px;color:var(--muted);margin-top:5px;}
+
+/* ─── STAT CARDS ─── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:20px;position:relative;overflow:hidden;
+  transition:border .2s;
+}
+.stat:hover{border-color:var(--border2);}
+.stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.stat-ico{
+  width:34px;height:34px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.stat-ico.gold{background:var(--gold-glow);color:var(--gold);}
+.stat-ico.blue{background:rgba(74,143,212,.1);color:var(--info);}
+.stat-ico.green{background:rgba(61,184,133,.1);color:var(--success);}
+.stat-ico.warn{background:rgba(212,145,58,.1);color:var(--warn);}
+.stat-trend{font-size:10px;padding:3px 8px;border-radius:50px;font-weight:500;}
+.stat-trend.up{background:rgba(61,184,133,.1);color:var(--success);}
+.stat-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.stat-val{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-.5px;line-height:1;}
+
+/* ─── CHARTS ─── */
+.chart-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:24px;}
+.chart-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:20px;
+}
+.chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.chart-head h3{font-size:14px;font-weight:500;color:var(--text);}
+#bar-chart{display:flex;align-items:flex-end;gap:18px;height:200px;padding:0 10px;}
+.bg{display:flex;flex-direction:column;align-items:center;flex:1;gap:8px;}
+.b{
+  width:100%;background:var(--surface2);border-radius:4px 4px 0 0;
+  transition:all .3s;cursor:pointer;position:relative;
+}
+.b:hover{background:var(--gold-glow2);}
+.b.hi{background:linear-gradient(to top,var(--gold),var(--gold-light));}
+.bl{font-size:10px;color:var(--muted);font-weight:500;}
+
+/* ─── TABLES ─── */
+.tcard{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.tcard-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+}
+.tcard-head h3{font-size:13.5px;font-weight:500;color:var(--text);}
+.tcard-body{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--surface2);}
+th{
+  text-align:left;padding:12px 16px;
+  font-size:10px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.9px;
+  border-bottom:1px solid var(--border);
+}
+td{
+  padding:14px 16px;font-size:12.5px;color:var(--text2);
+  border-bottom:1px solid var(--border);
+}
+tbody tr:hover{background:var(--surface2);}
+.btn-sm{
+  height:30px;padding:0 14px;border-radius:6px;
+  font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s;
+}
+.btn-outline{
+  background:transparent;border:1px solid var(--border2);color:var(--muted2);
+}
+.btn-outline:hover{background:var(--surface2);color:var(--text);}
+.btn-gold-sm{
+  background:linear-gradient(135deg,var(--gold) 0%,var(--gold-pale) 100%);
+  color:#07091A;border:none;
+}
+.btn-gold-sm:hover{opacity:.9;}
+
+/* ─── MODALS ─── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;
+  z-index:2000;backdrop-filter:blur(4px);
+}
+.overlay.hidden{display:none;}
+.modal{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--radius-lg);width:90%;max-width:600px;
+  max-height:90vh;overflow-y:auto;
+  animation:modal-in .2s ease;
+}
+@keyframes modal-in{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px;border-bottom:1px solid var(--border);
+}
+.modal-header h3{font-size:18px;font-weight:500;color:var(--text);}
+.modal-close{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--surface2);border:none;
+  color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.modal-close:hover{background:var(--surface3);color:var(--text);}
+.modal-body{padding:24px;}
+.modal-footer{
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
+  padding:16px 24px;border-top:1px solid var(--border);
+}
+
+/* ─── FORMS ─── */
+.fcard{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:24px;
+}
+.fcard h3{font-size:16px;font-weight:500;color:var(--text);margin-bottom:20px;}
+.ff{margin-bottom:18px;}
+.ff label{
+  display:block;font-size:11px;font-weight:600;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;
+}
+.ff input,.ff select,.ff textarea{
+  width:100%;padding:10px 14px;
+  background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;outline:none;
+  transition:all .2s;
+}
+.ff input:focus,.ff select:focus,.ff textarea:focus{
+  border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow);
+}
+.ff textarea{resize:vertical;min-height:80px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.btn-row{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:20px;}
+
+/* ─── LOADING SPINNER ─── */
+.spinner{
+  width:16px;height:16px;border:2px solid var(--gold-glow);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin 0.6s linear infinite;display:inline-block;
+  vertical-align:middle;margin-left:8px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- ══ MOBILE OVERLAY ══ -->
+<div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-left">
+      <div class="login-left-logo">
+        <div class="logo-mark">A</div>
+        <div class="logo-wordmark">Aurum</div>
+      </div>
+      <div class="login-tagline">Where <span>precision</span> meets payroll elegance</div>
+      <div class="login-sub">Enterprise-grade compensation management for modern teams</div>
+    </div>
+    <div class="login-right">
+      <h2>Welcome Back</h2>
+      <p>Enter your credentials to access the dashboard</p>
+      <div id="login-error" class="error-msg"></div>
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="admin@aurum.io" required/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required/>
+        </div>
+        <button type="submit" class="btn-gold" id="login-btn">
+          Sign In<span id="login-spinner"></span>
+        </button>
+      </form>
+      <div class="login-footer-note">
+        Demo credentials: <strong>admin@aurum.io</strong> / <strong>admin123</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP SCREEN ══ -->
+<div id="app-screen">
+  <!-- ─── SIDEBAR ─── -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <div class="logo-mark">A</div>
+        <div class="logo-wordmark">Aurum</div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Management</div>
+      <button class="nav-btn active" onclick="showPage('dashboard',this)">
+        <i class="fa-solid fa-grid-2"></i>Dashboard
+      </button>
+      <button class="nav-btn" onclick="showPage('employees',this)">
+        <i class="fa-solid fa-users"></i>Employees
+      </button>
+      <button class="nav-btn" onclick="showPage('departments',this)">
+        <i class="fa-solid fa-sitemap"></i>Departments
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Payroll</div>
+      <button class="nav-btn" onclick="showPage('payslips',this)">
+        <i class="fa-solid fa-file-invoice-dollar"></i>Payslips
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Settings</div>
+      <button class="nav-btn" onclick="showPage('account',this)">
+        <i class="fa-solid fa-user-circle"></i>Account
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-row">
+        <div class="avatar" id="user-avatar">AD</div>
+        <div style="flex:1;">
+          <div class="u-name" id="user-name">Admin User</div>
+          <div class="u-role">Super Administrator</div>
+        </div>
+      </div>
+      <button class="nav-btn" style="margin-top:8px;" onclick="doLogout()">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>Sign Out
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <div class="main">
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-meta" id="topbar-date">Monday, 23 March 2026</div>
+      <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fa-solid fa-circle-half-stroke"></i>
+        <span class="theme-label" id="theme-label">Dark</span>
+      </div>
+      <button class="icon-btn">
+        <i class="fa-regular fa-bell"></i>
+        <div class="notif-dot"></div>
+      </button>
+    </div>
+
+    <div class="content">
+      <!-- ── DASHBOARD PAGE ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="pg-head">
+          <div>
+            <div class="pg-title">Payroll <span>Dashboard</span></div>
+            <div class="pg-sub">Overview of compensation metrics and system health</div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-ico gold"><i class="fa-solid fa-users"></i></div>
+              <div class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> +12%</div>
+            </div>
+            <div class="stat-label">Total Employees</div>
+            <div class="stat-val" id="stat-employees">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-ico blue"><i class="fa-solid fa-sitemap"></i></div>
+            </div>
+            <div class="stat-label">Departments</div>
+            <div class="stat-val" id="stat-departments">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-ico green"><i class="fa-solid fa-sack-dollar"></i></div>
+              <div class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> +8%</div>
+            </div>
+            <div class="stat-label">Monthly Payroll</div>
+            <div class="stat-val" id="stat-payroll">$0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <div class="stat-ico warn"><i class="fa-solid fa-coins"></i></div>
+            </div>
+            <div class="stat-label">Avg. Salary</div>
+            <div class="stat-val">$4.6k</div>
+          </div>
+        </div>
+
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Payroll Distribution (Last 12 Months)</h3>
+            </div>
+            <div id="bar-chart"></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Quick Actions</h3>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <button class="btn-sm btn-gold-sm" onclick="openModal('modal-add-emp')">
+                <i class="fa-solid fa-user-plus" style="margin-right:6px;"></i>Add Employee
+              </button>
+              <button class="btn-sm btn-outline" onclick="openModal('modal-add-dept')">
+                <i class="fa-solid fa-plus" style="margin-right:6px;"></i>New Department
+              </button>
+              <button class="btn-sm btn-outline">
+                <i class="fa-solid fa-file-arrow-down" style="margin-right:6px;"></i>Export Report
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tcard">
+          <div class="tcard-head">
+            <h3>Recent Employees</h3>
+          </div>
+          <div class="tcard-body">
+            <table id="employees-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Position</th>
+                  <th>Salary</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="employees-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">
+                  <div class="spinner"></div> Loading employees...
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EMPLOYEES PAGE ── -->
+      <div class="page" id="page-employees">
+        <div class="pg-head">
+          <div>
+            <div class="pg-title">Employee <span>Registry</span></div>
+            <div class="pg-sub">Manage your workforce and compensation details</div>
+          </div>
+          <button class="btn-sm btn-gold-sm" onclick="openModal('modal-add-emp')">
+            <i class="fa-solid fa-user-plus" style="margin-right:6px;"></i>Add Employee
+          </button>
+        </div>
+        <div class="tcard">
+          <div class="tcard-body">
+            <table id="all-employees-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th>Position</th>
+                  <th>Salary</th>
+                </tr>
+              </thead>
+              <tbody id="all-employees-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">
+                  <div class="spinner"></div> Loading...
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DEPARTMENTS PAGE ── -->
+      <div class="page" id="page-departments">
+        <div class="pg-head">
+          <div>
+            <div class="pg-title">Department <span>Overview</span></div>
+            <div class="pg-sub">Organizational structure and budget allocation</div>
+          </div>
+          <button class="btn-sm btn-gold-sm" onclick="openModal('modal-add-dept')">
+            <i class="fa-solid fa-plus" style="margin-right:6px;"></i>New Department
+          </button>
+        </div>
+        <div class="tcard">
+          <div class="tcard-body">
+            <table id="departments-table">
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Head</th>
+                  <th>Budget</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="departments-tbody">
+                <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--muted);">
+                  <div class="spinner"></div> Loading...
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PAYSLIPS PAGE ── -->
+      <div class="page" id="page-payslips">
+        <div class="pg-head">
+          <div>
+            <div class="pg-title">Payslip <span>Archive</span></div>
+            <div class="pg-sub">Historical compensation statements and records</div>
+          </div>
+        </div>
+        <div class="tcard">
+          <div class="tcard-body">
+            <p style="padding:40px;text-align:center;color:var(--muted);">
+              Payslip generation coming soon...
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ACCOUNT PAGE ── -->
+      <div class="page" id="page-account">
+        <div class="pg-head">
+          <div>
+            <div class="pg-title">Account <span>Settings</span></div>
+            <div class="pg-sub">Manage your profile and preferences</div>
+          </div>
+        </div>
+        <div class="fcard" style="max-width:500px;">
+          <h3>Profile Details</h3>
+          <div class="fg">
+            <div class="ff">
+              <label>First Name</label>
+              <input id="profile-firstname" value="Admin"/>
+            </div>
+            <div class="ff">
+              <label>Last Name</label>
+              <input id="profile-lastname" value="User"/>
+            </div>
+          </div>
+          <div class="ff">
+            <label>Email</label>
+            <input id="profile-email" value="admin@aurum.io" readonly style="color:var(--muted);cursor:not-allowed;"/>
+          </div>
+          <div class="btn-row">
+            <button class="btn-sm btn-outline">Discard</button>
+            <button class="btn-sm btn-gold-sm">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── FOOTER ─── -->
+    <div class="app-footer">
+      <div class="footer-credits">
+        <span>© 2026 Aurum Payroll Platform</span>
+        <span>•</span>
+        <span>Built by <a href="#" class="footer-link">Brian Obonyo</a></span>
+      </div>
+      <div>
+        <span>v1.0.0</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD EMPLOYEE MODAL ══ -->
+<div class="overlay hidden" id="modal-add-emp">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <h3>Add Employee</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-emp')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <form id="add-employee-form" onsubmit="handleAddEmployee(event)">
+      <div class="modal-body">
+        <div class="fg">
+          <div class="ff">
+            <label>First Name</label>
+            <input id="emp-firstname" required/>
+          </div>
+          <div class="ff">
+            <label>Last Name</label>
+            <input id="emp-lastname" required/>
+          </div>
+        </div>
+        <div class="ff">
+          <label>Email</label>
+          <input type="email" id="emp-email" required/>
+        </div>
+        <div class="fg">
+          <div class="ff">
+            <label>Department</label>
+            <select id="emp-department" required>
+              <option>Engineering</option>
+              <option>Sales</option>
+              <option>Operations</option>
+              <option>Finance</option>
+              <option>HR</option>
+            </select>
+          </div>
+          <div class="ff">
+            <label>Position</label>
+            <input id="emp-position" required/>
+          </div>
+        </div>
+        <div class="ff">
+          <label>Basic Salary (USD)</label>
+          <input type="number" id="emp-salary" step="100" required/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-sm btn-outline" onclick="closeModal('modal-add-emp')">Cancel</button>
+        <button type="submit" class="btn-sm btn-gold-sm">Add Employee</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ ADD DEPARTMENT MODAL ══ -->
+<div class="overlay hidden" id="modal-add-dept">
+  <div class="modal" style="max-width:450px;">
+    <div class="modal-header">
+      <h3>New Department</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-dept')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <form id="add-department-form" onsubmit="handleAddDepartment(event)">
+      <div class="modal-body">
+        <div class="ff">
+          <label>Department Name</label>
+          <input id="dept-name" required/>
+        </div>
+        <div class="ff">
+          <label>Department Head</label>
+          <input id="dept-head"/>
+        </div>
+        <div class="ff">
+          <label>Monthly Budget (USD)</label>
+          <input type="number" id="dept-budget" step="1000"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-sm btn-outline" onclick="closeModal('modal-add-dept')">Cancel</button>
+        <button type="submit" class="btn-sm btn-gold-sm">Create Department</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// API Configuration
+// ═══════════════════════════════════════════════════════════════
+const API_URL = 'http://localhost:3000/api';
+let authToken = localStorage.getItem('authToken');
+
+// ═══════════════════════════════════════════════════════════════
+// Theme Management
+// ═══════════════════════════════════════════════════════════════
+function toggleTheme() {
+  const root = document.documentElement;
+  const currentTheme = root.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', newTheme);
+  document.getElementById('theme-label').textContent = newTheme.charAt(0).toUpperCase() + newTheme.slice(1);
+  localStorage.setItem('theme', newTheme);
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('theme-label').textContent = savedTheme.charAt(0).toUpperCase() + savedTheme.slice(1);
+
+// ═══════════════════════════════════════════════════════════════
+// Mobile Menu
+// ═══════════════════════════════════════════════════════════════
+function toggleMobileMenu() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.querySelector('.mobile-overlay').classList.toggle('active');
+}
+
+function closeMobileMenu() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.querySelector('.mobile-overlay').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Authentication
+// ═══════════════════════════════════════════════════════════════
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const errorMsg = document.getElementById('login-error');
+  
+  btn.disabled = true;
+  document.getElementById('login-spinner').innerHTML = '<span class="spinner"></span>';
+  errorMsg.classList.remove('show');
+  
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      authToken = data.token;
+      localStorage.setItem('authToken', authToken);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Update UI
+      document.getElementById('user-name').textContent = `${data.user.first_name} ${data.user.last_name}`;
+      document.getElementById('user-avatar').textContent = 
+        data.user.first_name[0] + data.user.last_name[0];
+      
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app-screen').classList.add('active');
+      
+      loadDashboardData();
+    } else {
+      errorMsg.textContent = data.error || 'Login failed';
+      errorMsg.classList.add('show');
+    }
+  } catch (error) {
+    errorMsg.textContent = 'Connection error. Make sure the backend server is running.';
+    errorMsg.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    document.getElementById('login-spinner').innerHTML = '';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+  authToken = null;
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+  closeMobileMenu();
+}
+
+// Check if already logged in
+if (authToken) {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (user.first_name) {
+    document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
+    document.getElementById('user-avatar').textContent = user.first_name[0] + user.last_name[0];
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').classList.add('active');
+    loadDashboardData();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// API Calls
+// ═══════════════════════════════════════════════════════════════
+async function fetchAPI(endpoint, options = {}) {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+      ...options.headers
+    }
+  });
+  
+  if (response.status === 401) {
+    doLogout();
+    throw new Error('Unauthorized');
+  }
+  
+  return response.json();
+}
+
+async function loadDashboardData() {
+  try {
+    // Load stats
+    const stats = await fetchAPI('/stats/dashboard');
+    document.getElementById('stat-employees').textContent = stats.totalEmployees || 0;
+    document.getElementById('stat-departments').textContent = stats.totalDepartments || 0;
+    document.getElementById('stat-payroll').textContent = 
+      '$' + (stats.totalPayroll || 0).toLocaleString();
+    
+    // Load employees
+    loadEmployees();
+    loadDepartments();
+  } catch (error) {
+    console.error('Failed to load dashboard:', error);
+  }
+}
+
+async function loadEmployees() {
+  try {
+    const employees = await fetchAPI('/employees');
+    
+    const tbody = document.getElementById('employees-tbody');
+    const allTbody = document.getElementById('all-employees-tbody');
+    
+    if (employees.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">No employees found</td></tr>';
+      allTbody.innerHTML = tbody.innerHTML;
+      return;
+    }
+    
+    const renderRow = (emp) => `
+      <tr>
+        <td style="color:var(--muted);font-size:11px;font-family:monospace;">${emp.emp_id}</td>
+        <td style="color:var(--text);font-weight:500;">${emp.first_name} ${emp.last_name}</td>
+        <td style="color:var(--text2);">${emp.email || emp.department}</td>
+        <td style="color:var(--muted2);">${emp.position}</td>
+        <td style="font-weight:600;">$${emp.basic_salary.toLocaleString()}</td>
+        <td><span class="stat-trend up" style="font-size:9px;">Active</span></td>
+      </tr>
+    `;
+    
+    tbody.innerHTML = employees.slice(0, 5).map(renderRow).join('');
+    allTbody.innerHTML = employees.map(renderRow).join('');
+  } catch (error) {
+    console.error('Failed to load employees:', error);
+  }
+}
+
+async function loadDepartments() {
+  try {
+    const departments = await fetchAPI('/departments');
+    const tbody = document.getElementById('departments-tbody');
+    
+    if (departments.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--muted);">No departments found</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = departments.map(dept => `
+      <tr>
+        <td style="color:var(--text);font-weight:500;">${dept.name}</td>
+        <td style="color:var(--text2);">${dept.head || '—'}</td>
+        <td style="font-weight:600;color:var(--gold-light);">$${(dept.budget || 0).toLocaleString()}</td>
+        <td style="color:var(--muted2);">${new Date(dept.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Failed to load departments:', error);
+  }
+}
+
+async function handleAddEmployee(e) {
+  e.preventDefault();
+  
+  const data = {
+    first_name: document.getElementById('emp-firstname').value,
+    last_name: document.getElementById('emp-lastname').value,
+    email: document.getElementById('emp-email').value,
+    department: document.getElementById('emp-department').value,
+    position: document.getElementById('emp-position').value,
+    basic_salary: parseFloat(document.getElementById('emp-salary').value)
+  };
+  
+  try {
+    await fetchAPI('/employees', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    
+    closeModal('modal-add-emp');
+    document.getElementById('add-employee-form').reset();
+    loadDashboardData();
+    alert('Employee added successfully!');
+  } catch (error) {
+    alert('Failed to add employee: ' + error.message);
+  }
+}
+
+async function handleAddDepartment(e) {
+  e.preventDefault();
+  
+  const data = {
+    name: document.getElementById('dept-name').value,
+    head: document.getElementById('dept-head').value,
+    budget: parseFloat(document.getElementById('dept-budget').value) || 0
+  };
+  
+  try {
+    await fetchAPI('/departments', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    
+    closeModal('modal-add-dept');
+    document.getElementById('add-department-form').reset();
+    loadDepartments();
+    alert('Department created successfully!');
+  } catch (error) {
+    alert('Failed to create department: ' + error.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI Functions
+// ═══════════════════════════════════════════════════════════════
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  
+  const titles = {
+    dashboard: 'Dashboard',
+    employees: 'Employees',
+    departments: 'Departments',
+    payslips: 'Payslips',
+    account: 'Account'
+  };
+  document.getElementById('topbar-title').textContent = titles[id] || id;
+  
+  closeMobileMenu();
+  
+  // Load data when switching pages
+  if (id === 'employees') loadEmployees();
+  if (id === 'departments') loadDepartments();
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.add('hidden');
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Chart
+// ═══════════════════════════════════════════════════════════════
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const vals = [72, 68, 81, 78, 86, 94, 88, 91, 97, 84, 89, 94];
+const bc = document.getElementById('bar-chart');
+if (bc) {
+  const mx = Math.max(...vals);
+  months.forEach((m, i) => {
+    const g = document.createElement('div');
+    g.className = 'bg';
+    const b = document.createElement('div');
+    b.className = 'b' + (i === 11 ? ' hi' : '');
+    b.style.height = (vals[i] / mx * 100) + '%';
+    b.title = '$' + vals[i] + 'k';
+    const l = document.createElement('div');
+    l.className = 'bl';
+    l.textContent = m;
+    g.appendChild(b);
+    g.appendChild(l);
+    bc.appendChild(g);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Date
+// ═══════════════════════════════════════════════════════════════
+const d = new Date();
+const tn = document.getElementById('topbar-date');
+if (tn) tn.textContent = d.toLocaleDateString('en-GB', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+});
+</script>
+</body>
+</html>
